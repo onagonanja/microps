@@ -217,7 +217,7 @@ static void ip_input(const uint8_t *data, size_t len, struct net_device *dev) {
   struct ip_protocol *entry;
   for(entry = protocols; entry; entry = entry->next) {
     if(entry->type == hdr->protocol) {
-      entry->handler(data, len, hdr->src, hdr->dst, iface);
+      entry->handler((uint8_t *)hdr + hlen, total - hlen, hdr->src, hdr->dst, iface);
       return;
     }
   }
@@ -253,7 +253,7 @@ static ssize_t ip_output_core(struct ip_iface *iface, uint8_t protocol, const ui
   hdr->tos = 0;
   hdr->ttl = 255;
   hdr->total = ntoh16(total);
-  hdr->id = id;
+  hdr->id = hton16(id);
   hdr->protocol = protocol;
   hdr->offset = ntoh16(offset);
   hdr->src = src;
