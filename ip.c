@@ -161,13 +161,13 @@ static void ip_input(const uint8_t *data, size_t len, struct net_device *dev) {
   }
   hlen = (hdr->vhl & 0x0f) << 2;
   if(hlen > len) {
-    errorf("length of ip data is less than length of header");
+    errorf("length of ip data(%d) is less than length of header(%d)", len, hlen);
   }
   total = ntoh16(hdr->total);
   if(len < total) {
-    errorf("length of ip data is less than total length");
+    errorf("length of ip data(%d) is less than total length(%d)", len, total);
   }
-  if(cksum16((uint16_t *)data, len, 0) != 0) {
+  if(cksum16((uint16_t *)hdr, hlen, 0) != 0) {
     errorf("check sum is not correct");
   }
   offset = ntoh16(hdr->offset);
@@ -197,7 +197,7 @@ static int ip_output_device(struct ip_iface *iface, const uint8_t *data, size_t 
     }
   }
 
-  return net_device_output(NET_IFACE(iface)->dev, NET_PROTOCOL_TYPE_IP, data, sizeof(data), NULL);
+  return net_device_output(NET_IFACE(iface)->dev, NET_PROTOCOL_TYPE_IP, data, len, NULL);
 }
 
 static ssize_t ip_output_core(struct ip_iface *iface, uint8_t protocol, const uint8_t *data, size_t len, ip_addr_t src, ip_addr_t dst, uint16_t id, uint16_t offset) {
@@ -207,20 +207,21 @@ static ssize_t ip_output_core(struct ip_iface *iface, uint8_t protocol, const ui
   char addr[IP_ADDR_STR_LEN];
 
   hlen = IP_HDR_SIZE_MIN;
-  total = hlen + IP_HDR_SIZE_MIN;
+  debugf("hlen: %d, len: %d", hlen, len);
+  total = (uint16_t)(hlen + len);
 
   hdr = (struct ip_hdr *)buf;
   hdr->vhl = (IP_VERSION_IPV4 << 4) | (hlen >> 2);
   hdr->tos = 0;
   hdr->ttl = 255;
-  hdr->total = total;
+  hdr->total = ntoh16(total);
   hdr->id = id;
   hdr->protocol = protocol;
-  hdr->offset = offset;
+  hdr->offset = ntoh16(offset);
   hdr->src = src;
   hdr->dst = dst;
   hdr->sum = 0;
-  hdr->sum = cksum16((uint16_t *)hdr, len, 0);
+  hdr->sum = cksum16((uint16_t *)hdr, hlen, 0);
   memcpy(hdr + 1, data, len);
   debugf("dev=%s, dst=%s, protocol=%u, len=%u", NET_IFACE(iface)->dev->name, ip_addr_ntop(dst, addr, sizeof(addr)), protocol, total);
   ip_dump(buf, total);
