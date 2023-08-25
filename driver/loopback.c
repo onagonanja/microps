@@ -57,6 +57,7 @@ static int loopback_transmit(struct net_device *dev, uint16_t type, const uint8_
 static int loopback_isr(unsigned int irq, void *id) {
   struct net_device *dev;
   struct loopback_queue_entry *entry;
+
   dev = (struct net_device *)id;
   mutex_lock(&PRIV(dev)->mutex);
   while(1) {
