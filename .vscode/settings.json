@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.tsx": "typescriptreact",
-        "dummy.h": "c"
+        "dummy.h": "c",
+        "loopback.h": "c"
     }
 }
