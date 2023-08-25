@@ -232,6 +232,7 @@ int net_init(void) {
     errorf("ip_init() failure");
     return -1;
   }
+  icmp_init();
   infof("initialized");
   return 0;
 }
