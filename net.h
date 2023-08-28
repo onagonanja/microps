@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/time.h>
 
 #ifndef IFNAMSIZ
 #define IFNAMSIZ 16
@@ -76,5 +77,7 @@ extern int net_softirq_handler(void);
 extern int net_run(void);
 extern void net_shutdown(void);
 extern int net_init(void);
+extern int net_timer_register(struct timeval interval, void (*handler)(void));
+extern int net_timer_handler(void);
 
 #endif
