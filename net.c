@@ -181,7 +181,7 @@ int net_timer_handler(void) {
   struct net_timer *timer;
   struct timeval now, diff;
 
-  for(timer = timers; timer ; timer = timer->next) {
+  for(timer = timers; timer; timer = timer->next) {
     gettimeofday(&now, NULL);
     timersub(&now, &timer->last, &diff);
     if(timercmp(&timer->interval, &diff, <) != 0) { /* true (!0) or false (0) */
@@ -278,7 +278,14 @@ int net_init(void) {
     errorf("ip_init() failure");
     return -1;
   }
-  icmp_init();
+  if(icmp_init() == -1) {
+    errorf("icmp_init() failure");
+    return -1;
+  }
+  if(udp_init() == -1) {
+    errorf("udp_init() failure");
+    return -1;
+  }
   infof("initialized");
   return 0;
 }
