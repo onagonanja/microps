@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
+#include <linux/if.h>
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <netpacket/packet.h>
