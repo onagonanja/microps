@@ -8,6 +8,7 @@
 #include "ip.h"
 #include "net.h"
 #include "platform.h"
+#include "tcp.h"
 #include "util.h"
 
 #define PRIV(x) ((struct net_protocol *)x->priv)
@@ -318,6 +319,10 @@ int net_init(void) {
   }
   if(udp_init() == -1) {
     errorf("udp_init() failure");
+    return -1;
+  }
+  if(tcp_init() == -1) {
+    errorf("tcp_init() failure");
     return -1;
   }
   infof("initialized");
