@@ -233,7 +233,7 @@ int ip_iface_register(struct net_device *dev, struct ip_iface *iface) {
     return -1;
   }
 
-  if(ip_route_add((iface->unicast & iface->netmask), iface->netmask, iface->unicast, iface) == -1) {
+  if(ip_route_add((iface->unicast & iface->netmask), iface->netmask, IP_ADDR_ANY, iface) == -1) {
     errorf("ip_route_add() failure");
     return -1;
   }
@@ -360,10 +360,10 @@ static ssize_t ip_output_core(struct ip_iface *iface, uint8_t protocol, const ui
   hdr->vhl = (IP_VERSION_IPV4 << 4) | (hlen >> 2);
   hdr->tos = 0;
   hdr->ttl = 255;
-  hdr->total = ntoh16(total);
+  hdr->total = hton16(total);
   hdr->id = hton16(id);
   hdr->protocol = protocol;
-  hdr->offset = ntoh16(offset);
+  hdr->offset = hton16(offset);
   hdr->src = src;
   hdr->dst = dst;
   hdr->sum = 0;
